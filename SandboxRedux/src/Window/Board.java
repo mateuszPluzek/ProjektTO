@@ -2,6 +2,8 @@ package Window;
 
 import Particle.*;
 import RandomNum.RandomEvent;
+import memento.History;
+import memento.Memento;
 
 import java.util.ArrayList;
 
@@ -14,9 +16,11 @@ public class Board {
 //    temperature board
     private int[][] tempField;
     private ArrayList<TargetRec> ignoreList = new ArrayList<>();
+    private History history;
 
     public Board(int height, int width, int gridSize) {
 
+        this.history = new History();
         this.gridSize = gridSize;
 
         this.rows = height / gridSize;
@@ -29,6 +33,23 @@ public class Board {
             for(int j = 0; j < cols; j++) {
                 board[i][j] = new Air(this,i, j);
                 tempField[i][j] = 10;
+            }
+        }
+    }
+
+    public Board(Board newBoard) {
+        this.history = new History();
+        this.gridSize = newBoard.getGridSize();
+        this.rows = newBoard.getRows();
+        this.cols = newBoard.getCols();
+
+        board = new Particle[rows][cols];
+        tempField = new int[rows][cols];
+
+        for(int i = 0;i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                board[i][j] = newBoard.getParticle(i, j);
+                tempField[i][j] = getTemp(i, j);
             }
         }
     }
@@ -61,6 +82,30 @@ public class Board {
             }
         }
     }
+
+    public Board backup() {
+        return new Board(this);
+    }
+
+    public void restore(Board backup) {
+        this.gridSize = gridSize;
+
+        this.rows = backup.getRows();
+        this.cols = backup.getCols();
+
+        board = new Particle[rows][cols];
+        tempField = new int[rows][cols];
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                board[i][j] = backup.getParticle(i, j);
+                tempField[i][j] = backup.getTemp(i, j);
+            }
+        }
+    }
+
+
+
 
     public void move(int i, int j, String dir) {
         BoardServices.move(i, j, dir, tempField, board, this, ignoreList);
@@ -103,5 +148,9 @@ public class Board {
 
     public int getGridSize() {
         return gridSize;
+    }
+
+    public History getHistory() {
+        return history;
     }
 }

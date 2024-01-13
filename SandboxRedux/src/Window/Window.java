@@ -2,6 +2,7 @@ package Window;
 
 import Particle.*;
 import States.Window.*;
+import memento.Memento;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.awt.event.MouseEvent;
 public class Window {
     private JFrame frame = new JFrame();
     private ButtonState state;
+
     public Window(String title, int width, int height, Board board) {
         state = new DrawAirState();
 //        basic setup
@@ -104,9 +106,16 @@ public class Window {
 
             // reset buttons
             JPanel menuPanel = new JPanel();
-            JButton buttonReset = new JButton("reset");
+            JButton buttonReset = new JButton("Reset");
             JButton buttonTemperature = new JButton("toggle temperature");
             buttonTemperature.setBackground(new Color(0xF3F3F3));
+            JButton saveBackup = new JButton("Save");
+            JButton loadBackup = new JButton("Load");
+            //lista
+            DefaultListModel<String> loadListModel = new DefaultListModel<>();
+            JList<String> loadList = new JList<>();
+            loadList.setModel(loadListModel);
+            loadList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
             buttonReset.addActionListener(new ActionListener() {
                 @Override
@@ -129,9 +138,28 @@ public class Window {
                         buttonTemperature.setBackground(new Color(0xF3F3F3));
                 }
             });
+            saveBackup.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    board.getHistory().takeMemento(new Memento(board));
+                    loadListModel.clear();
+                    for(int i = 0; i < board.getHistory().getSavedHistory().size();i++) {
+                        loadListModel.addElement("     "+String.valueOf(i)+"     ");
+                    }
+                }
+            });
+            loadBackup.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    board.getHistory().loadHistory(Integer.parseInt(loadList.getSelectedValue().strip())).restore();
+                }
+            });
 
             menuPanel.add(buttonReset);
             menuPanel.add(buttonTemperature);
+            menuPanel.add(saveBackup);
+            menuPanel.add(loadBackup);
+            menuPanel.add(new JScrollPane(loadList));
 
             mainPanel.add(buttonPanel);
             mainPanel.add(toolsPanel);
