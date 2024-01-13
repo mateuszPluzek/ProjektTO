@@ -54,7 +54,7 @@ public class Fire extends Particle{
     @Override
     public void selfTick() {
 
-        getBoard().incTemp(getRow(), getCol(), 40);
+        getBoard().incTemp(getRow(), getCol(), 50);
 
         if(getBoard().getTemp(getRow(), getCol()) < 100)
             disappear();

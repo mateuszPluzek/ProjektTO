@@ -49,7 +49,7 @@ public class Gunpowder extends Particle{
             int j = getCol();
             int i = getRow();
             getBoard().setParticle(i, j, new Fire(getBoard(), i, j));
-            getBoard().setTemp(i, j, 150);
+            getBoard().setTemp(i, j, 800);
         }
     }
 }
